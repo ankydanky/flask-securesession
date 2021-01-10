@@ -23,7 +23,7 @@ class MemcachedSessionInterface(SessionInterface):
     serializer = pickle
     session_class = MemcachedSession
 
-    def __init__(self, client, key_prefix, use_signer=False, permanent=True):
+    def __init__(self, client, key_prefix, use_signer=True, permanent=True):
         if client is None:
             client = self._get_preferred_memcache_client()
             if client is None:

@@ -30,7 +30,7 @@ class RedisSessionInterface(SessionInterface):
     serializer = pickle
     session_class = RedisSession
 
-    def __init__(self, redis, key_prefix, use_signer=False, permanent=True):
+    def __init__(self, redis, key_prefix, use_signer=True, permanent=True):
         if redis is None:
             from redis import Redis
             redis = Redis()

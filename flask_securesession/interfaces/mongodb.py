@@ -28,7 +28,7 @@ class MongoDBSessionInterface(SessionInterface):
     serializer = pickle
     session_class = MongoDBSession
 
-    def __init__(self, client, db, collection, key_prefix, use_signer=False, permanent=True):
+    def __init__(self, client, db, collection, key_prefix, use_signer=True, permanent=True):
         if client is None:
             from pymongo import MongoClient
             client = MongoClient()

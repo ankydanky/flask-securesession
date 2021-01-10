@@ -27,7 +27,7 @@ class SqlAlchemySessionInterface(SessionInterface):
     serializer = pickle
     session_class = SqlAlchemySession
 
-    def __init__(self, app, db, table, key_prefix, use_signer=False, permanent=True):
+    def __init__(self, app, db, table, key_prefix, use_signer=True, permanent=True):
         if db is None:
             from flask_sqlalchemy import SQLAlchemy
             db = SQLAlchemy(app)
