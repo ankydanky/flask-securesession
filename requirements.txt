@@ -1,0 +1,3 @@
+Flask==1.1.2
+pycryptodome==3.9.9
+pycodestyle==2.6.0
