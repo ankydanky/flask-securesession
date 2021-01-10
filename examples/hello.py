@@ -3,13 +3,13 @@
     Hello
     ~~~~~
 
-    Flask-Session demo.
+    Flask-SecureSession demo.
 
     :copyright: (c) 2014 by Shipeng Feng.
     :license: BSD, see LICENSE for more details.
 """
 from flask import Flask, session
-from flask_session import Session
+from flask_securesession import Session
 
 
 SESSION_TYPE = 'redis'
