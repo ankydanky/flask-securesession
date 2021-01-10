@@ -4,6 +4,8 @@ from .base import SessionInterface
 from ..sessions import FileSystemSession
 from ..helpers import encrypt, decrypt, total_seconds
 
+from itsdangerous import want_bytes
+
 
 class FileSystemSessionInterface(SessionInterface):
     """Uses the :class:`cachelib.file.FileSystemCache` as a session backend.
@@ -47,6 +49,7 @@ class FileSystemSessionInterface(SessionInterface):
                 return self.session_class(sid=sid, permanent=self.permanent)
 
         data = self.cache.get(self.key_prefix + sid)
+        data = decrypt(app.secret_key[:16], data)
         if data is not None:
             return self.session_class(data, sid=sid)
         return self.session_class(sid=sid, permanent=self.permanent)
@@ -64,6 +67,7 @@ class FileSystemSessionInterface(SessionInterface):
         secure = self.get_cookie_secure(app)
         expires = self.get_expiration_time(app, session)
         data = dict(session)
+        data = encrypt(app.secret_key[:16], data)
         self.cache.set(self.key_prefix + session.sid, data, total_seconds(app.permanent_session_lifetime))
         if self.use_signer:
             session_id = self._get_signer(app).sign(want_bytes(session.sid))
