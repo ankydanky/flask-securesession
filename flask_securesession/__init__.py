@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-    flask_session
-    ~~~~~~~~~~~~~
+    flask_securesession
+    ~~~~~~~~~~~~~-------
 
-    Adds server session support to your application.
+    Adds encrypted server session support to your application.
 
     :copyright: (c) 2014 by Shipeng Feng.
     :license: BSD, see LICENSE for more details.
+
+    forked by NDK
 """
 
 __version__ = '0.3.3'
 
 import os
 
-from .sessions import NullSessionInterface, RedisSessionInterface, \
+from .interfaces import NullSessionInterface, RedisSessionInterface, \
     MemcachedSessionInterface, FileSystemSessionInterface, \
     MongoDBSessionInterface, SqlAlchemySessionInterface
 
@@ -68,8 +70,7 @@ class Session(object):
         config.setdefault('SESSION_KEY_PREFIX', 'session:')
         config.setdefault('SESSION_REDIS', None)
         config.setdefault('SESSION_MEMCACHED', None)
-        config.setdefault('SESSION_FILE_DIR',
-                          os.path.join(os.getcwd(), 'flask_session'))
+        config.setdefault('SESSION_FILE_DIR', os.path.join(os.getcwd(), 'flask_session'))
         config.setdefault('SESSION_FILE_THRESHOLD', 500)
         config.setdefault('SESSION_FILE_MODE', 384)
         config.setdefault('SESSION_MONGODB', None)
