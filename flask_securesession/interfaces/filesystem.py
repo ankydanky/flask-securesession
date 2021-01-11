@@ -49,8 +49,8 @@ class FileSystemSessionInterface(SessionInterface):
                 return self.session_class(sid=sid, permanent=self.permanent)
 
         data = self.cache.get(self.key_prefix + sid)
-        data = decrypt(app.secret_key[:16], data)
         if data is not None:
+            data = decrypt(app.secret_key[:16], data)
             return self.session_class(data, sid=sid)
         return self.session_class(sid=sid, permanent=self.permanent)
 
