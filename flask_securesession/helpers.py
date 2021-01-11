@@ -3,29 +3,36 @@
 import json
 
 from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
+
+
+def hashEncryptionKey(secret):
+    if isinstance(secret, str):
+        secret = secret.encode()
+    h = SHA256.new(secret)
+    return h.hexdigest().encode()
 
 
 def encrypt(enckey, data):
-    if isinstance(enckey, str):
-        enckey = enckey.encode()
+    enckey = hashEncryptionKey(enckey)
     
     if isinstance(data, str):
         data = data.encode()
     elif isinstance(data, dict):
         data = json.dumps(data).encode()
     
-    cipher = AES.new(enckey, AES.MODE_CFB, iv=enckey[::-1])
+    cipher = AES.new(enckey[:16], AES.MODE_CFB, iv=enckey[20:36])
     ciphertext = cipher.encrypt(data)
     return ciphertext
 
 
 def decrypt(enckey, ciphertext):
+    enckey = hashEncryptionKey(enckey)
+
     if isinstance(ciphertext, str):
         data = ciphertext.encode()
-    if isinstance(enckey, str):
-        enckey = enckey.encode()
     
-    cipher = AES.new(enckey, AES.MODE_CFB, iv=enckey[::-1])
+    cipher = AES.new(enckey[:16], AES.MODE_CFB, iv=enckey[20:36])
     data = cipher.decrypt(ciphertext)
     
     try:
