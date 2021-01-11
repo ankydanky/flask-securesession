@@ -4,6 +4,8 @@ from uuid import uuid4
 
 from flask.sessions import SessionInterface as FlaskSessionInterface
 
+from itsdangerous import Signer
+
 
 class SessionInterface(FlaskSessionInterface):
     
