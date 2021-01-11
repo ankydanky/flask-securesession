@@ -6,7 +6,7 @@ Flask-Session is an extension for Flask that adds support for
 Server-side Session to your application.
 
 """
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(
@@ -18,13 +18,14 @@ setup(
     author_email='andy@ndk.sytes.net',
     description='Adds encrypted server-side session support to your Flask application',
     long_description=__doc__,
-    packages=['flask_securesession'],
+    packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'Flask>=0.8',
-        'cachelib'
+        'Flask>=1.0',
+        'cachelib',
+        'pycryptodome>=3.9.9'
     ],
     test_suite='test_session',
     classifiers=[
