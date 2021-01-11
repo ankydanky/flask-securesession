@@ -11,7 +11,7 @@
     forked by NDK
 """
 
-__version__ = '0.3.3'
+__version__ = '0.3.2'
 
 import os
 
@@ -64,9 +64,9 @@ class Session(object):
 
     def _get_interface(self, app):
         config = app.config.copy()
-        config.setdefault('SESSION_TYPE', 'null')
+        config.setdefault('SESSION_TYPE', 'filesystem')
         config.setdefault('SESSION_PERMANENT', True)
-        config.setdefault('SESSION_USE_SIGNER', False)
+        config.setdefault('SESSION_USE_SIGNER', True)
         config.setdefault('SESSION_KEY_PREFIX', 'session:')
         config.setdefault('SESSION_REDIS', None)
         config.setdefault('SESSION_MEMCACHED', None)
