@@ -50,7 +50,7 @@ class FileSystemSessionInterface(SessionInterface):
 
         data = self.cache.get(self.key_prefix + sid)
         if data is not None:
-            data = decrypt(app.secret_key[:16], data)
+            data = decrypt(app.secret_key, data)
             return self.session_class(data, sid=sid)
         return self.session_class(sid=sid, permanent=self.permanent)
 
@@ -67,7 +67,7 @@ class FileSystemSessionInterface(SessionInterface):
         secure = self.get_cookie_secure(app)
         expires = self.get_expiration_time(app, session)
         data = dict(session)
-        data = encrypt(app.secret_key[:16], data)
+        data = encrypt(app.secret_key, data)
         self.cache.set(self.key_prefix + session.sid, data, total_seconds(app.permanent_session_lifetime))
         if self.use_signer:
             session_id = self._get_signer(app).sign(want_bytes(session.sid))

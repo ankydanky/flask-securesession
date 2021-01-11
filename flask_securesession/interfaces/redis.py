@@ -59,6 +59,7 @@ class RedisSessionInterface(SessionInterface):
             sid = sid.decode('utf-8', 'strict')
         val = self.redis.get(self.key_prefix + sid)
         if val is not None:
+            val = decrypt(app.secret_key, val)
             try:
                 data = self.serializer.loads(val)
                 return self.session_class(data, sid=sid)
@@ -89,6 +90,7 @@ class RedisSessionInterface(SessionInterface):
         secure = self.get_cookie_secure(app)
         expires = self.get_expiration_time(app, session)
         val = self.serializer.dumps(dict(session))
+        val = encrypt(app.secret_key, val)
         self.redis.setex(
             name=self.key_prefix + session.sid,
             value=val,

@@ -85,12 +85,13 @@ class MemcachedSessionInterface(SessionInterface):
             full_session_key = full_session_key.encode('utf-8')
         val = self.client.get(full_session_key)
         if val is not None:
+            val = decrypt(app.secret_key, val)
             try:
                 if not PY2:
                     val = want_bytes(val)
                 data = self.serializer.loads(val)
                 return self.session_class(data, sid=sid)
-            except:
+            except Exception as e:
                 return self.session_class(sid=sid, permanent=self.permanent)
         return self.session_class(sid=sid, permanent=self.permanent)
 
@@ -103,8 +104,7 @@ class MemcachedSessionInterface(SessionInterface):
         if not session:
             if session.modified:
                 self.client.delete(full_session_key)
-                response.delete_cookie(app.session_cookie_name,
-                                       domain=domain, path=path)
+                response.delete_cookie(app.session_cookie_name, domain=domain, path=path)
             return
 
         httponly = self.get_cookie_httponly(app)
@@ -114,8 +114,12 @@ class MemcachedSessionInterface(SessionInterface):
             val = self.serializer.dumps(dict(session), 0)
         else:
             val = self.serializer.dumps(dict(session))
-        self.client.set(full_session_key, val, self._get_memcache_timeout(
-                        total_seconds(app.permanent_session_lifetime)))
+        val = encrypt(app.secret_key, val)
+        self.client.set(
+            full_session_key,
+            val,
+            self._get_memcache_timeout(total_seconds(app.permanent_session_lifetime))
+        )
         if self.use_signer:
             session_id = self._get_signer(app).sign(want_bytes(session.sid))
         else:

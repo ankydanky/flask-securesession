@@ -61,8 +61,8 @@ class MongoDBSessionInterface(SessionInterface):
             self.store.remove({'id': store_id})
             document = None
         if document is not None:
+            val = decrypt(app.secret_key, document['val'])
             try:
-                val = document['val']
                 data = self.serializer.loads(want_bytes(val))
                 return self.session_class(data, sid=sid)
             except Exception as e:
@@ -83,6 +83,7 @@ class MongoDBSessionInterface(SessionInterface):
         secure = self.get_cookie_secure(app)
         expires = self.get_expiration_time(app, session)
         val = self.serializer.dumps(dict(session))
+        val = encrypt(app.secret_key, val)
         self.store.update(
             {'id': store_id},
             {

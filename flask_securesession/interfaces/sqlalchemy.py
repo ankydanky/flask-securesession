@@ -72,8 +72,7 @@ class SqlAlchemySessionInterface(SessionInterface):
                 return self.session_class(sid=sid, permanent=self.permanent)
 
         store_id = self.key_prefix + sid
-        saved_session = self.sql_session_model.query.filter_by(
-            session_id=store_id).first()
+        saved_session = self.sql_session_model.query.filter_by(session_id=store_id).first()
         if saved_session and saved_session.expiry <= datetime.utcnow():
             # Delete expired session
             self.db.session.delete(saved_session)
@@ -82,6 +81,7 @@ class SqlAlchemySessionInterface(SessionInterface):
         if saved_session:
             try:
                 val = saved_session.data
+                val = decrypt(app.secret_key, val)
                 data = self.serializer.loads(want_bytes(val))
                 return self.session_class(data, sid=sid)
             except Exception as e:
@@ -92,8 +92,7 @@ class SqlAlchemySessionInterface(SessionInterface):
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
         store_id = self.key_prefix + session.sid
-        saved_session = self.sql_session_model.query.filter_by(
-            session_id=store_id).first()
+        saved_session = self.sql_session_model.query.filter_by(session_id=store_id).first()
         if not session:
             if session.modified:
                 if saved_session:
@@ -106,6 +105,7 @@ class SqlAlchemySessionInterface(SessionInterface):
         secure = self.get_cookie_secure(app)
         expires = self.get_expiration_time(app, session)
         val = self.serializer.dumps(dict(session))
+        val = encrypt(app.secret_key, val)
         if saved_session:
             saved_session.data = val
             saved_session.expiry = expires
