@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Flask-SecureSession',
-    version='0.3.2',
+    version='0.3.3',
     url='https://github.com/ankydanky/flask-securesession',
     license='BSD',
     author='NDK',
@@ -24,7 +24,7 @@ setup(
     platforms='any',
     install_requires=[
         'Flask>=1.0',
-        'cachelib',
+        'cachelib>=0.1.1',
         'pycryptodome>=3.9.9'
     ],
     test_suite='test_session',
