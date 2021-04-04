@@ -1,10 +1,41 @@
 # coding: utf-8
 
+import time
+import os
+import pickle
+
 from .base import SessionInterface
 from ..sessions import FileSystemSession
 from ..helpers import encrypt, decrypt, total_seconds
 
 from itsdangerous import want_bytes
+
+from cachelib.file import FileSystemCache as FileSystemCacheBase
+
+class FileSystemCache(FileSystemCacheBase):
+    def __init__(self, cache_dir, threshold, mode):
+        super().__init__(cache_dir, threshold=threshold, mode=mode)
+    
+    def _prune(self):
+        """fix EOFError of original FileSystemCache class
+        appearing due to encrypted content"""
+        if self._threshold == 0 or not self._file_count > self._threshold:
+            return
+
+        entries = self._list_dir()
+        now = time.time()
+        for idx, fname in enumerate(entries):
+            try:
+                remove = False
+                with open(fname, 'rb') as f:
+                    expires = pickle.load(f)
+                remove = (expires != 0 and expires <= now) or idx % 3 == 0
+
+                if remove:
+                    os.remove(fname)
+            except (EOFError, IOError, OSError):
+                pass
+        self._update_count(value=len(self._list_dir()))
 
 
 class FileSystemSessionInterface(SessionInterface):
@@ -26,7 +57,6 @@ class FileSystemSessionInterface(SessionInterface):
     def __init__(
             self, cache_dir, threshold, mode, key_prefix,
             use_signer=True, permanent=True):
-        from cachelib.file import FileSystemCache
         self.cache = FileSystemCache(cache_dir, threshold=threshold, mode=mode)
         self.key_prefix = key_prefix
         self.use_signer = use_signer
