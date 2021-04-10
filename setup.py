@@ -7,7 +7,17 @@ Server-side Session to your application.
 
 """
 from setuptools import setup, find_packages
+from shutil import rmtree
 
+try:
+    rmtree("build")
+except FileNotFoundError:
+    pass
+
+try:
+    rmtree("Flask_SecureSession.egg-info")
+except FileNotFoundError:
+    pass
 
 setup(
     name='Flask-SecureSession',
