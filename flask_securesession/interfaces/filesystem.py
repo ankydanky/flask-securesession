@@ -8,7 +8,7 @@ from .base import SessionInterface
 from ..sessions import FileSystemSession
 from ..helpers import encrypt, decrypt, total_seconds
 
-from itsdangerous import want_bytes
+from itsdangerous import want_bytes, BadSignature
 
 from cachelib.file import FileSystemCache as FileSystemCacheBase
 

@@ -6,9 +6,9 @@ from datetime import datetime
 
 from .base import SessionInterface
 from ..sessions import SqlAlchemySession
-from ..helpers import encrypt, decrypt, total_seconds
+from ..helpers import encrypt, decrypt
 
-from itsdangerous import want_bytes
+from itsdangerous import want_bytes, BadSignature
 
 
 class SqlAlchemySessionInterface(SessionInterface):

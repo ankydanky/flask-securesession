@@ -6,7 +6,9 @@ import pickle
 from .base import SessionInterface
 
 from ..sessions import RedisSession
-from ..helpers import total_seconds
+from ..helpers import total_seconds, encrypt, decrypt
+
+from itsdangerous import BadSignature, want_bytes
 
 PY2 = sys.version_info[0] == 2
 if not PY2:
