@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Flask-SecureSession',
-    version='0.3.3',
+    version='0.3.4',
     url='https://github.com/ankydanky/flask-securesession',
     license='BSD',
     author='NDK',
