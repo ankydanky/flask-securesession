@@ -17,8 +17,7 @@ class FileSystemCache(FileSystemCacheBase):
         super().__init__(cache_dir, threshold=threshold, mode=mode)
     
     def _prune(self):
-        """fix EOFError of original FileSystemCache class
-        appearing due to encrypted content"""
+        """fix EOFError of original FileSystemCache"""
         if self._threshold == 0 or not self._file_count > self._threshold:
             return
 
