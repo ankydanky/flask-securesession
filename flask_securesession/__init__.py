@@ -8,10 +8,10 @@
     :copyright: (c) 2014 by Shipeng Feng.
     :license: BSD, see LICENSE for more details.
 
-    forked by NDK
+    forked and backported by NDK
 """
 
-__version__ = '0.3.4'
+__version__ = '0.4.0'
 
 import os
 
