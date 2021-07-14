@@ -40,6 +40,7 @@ class RedisSessionInterface(SessionInterface):
         self.key_prefix = key_prefix
         self.use_signer = use_signer
         self.permanent = permanent
+        self.has_same_site_capability = hasattr(self, "get_cookie_samesite")
 
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
@@ -87,9 +88,11 @@ class RedisSessionInterface(SessionInterface):
         # the permanent flag on the session itself.
         # if not self.should_set_cookie(app, session):
         #    return
-
+        conditional_cookie_kwargs = {}
         httponly = self.get_cookie_httponly(app)
         secure = self.get_cookie_secure(app)
+        if self.has_same_site_capability:
+            conditional_cookie_kwargs["samesite"] = self.get_cookie_samesite(app)
         expires = self.get_expiration_time(app, session)
         val = self.serializer.dumps(dict(session))
         val = encrypt(app.secret_key, val)
@@ -109,5 +112,6 @@ class RedisSessionInterface(SessionInterface):
             httponly=httponly,
             domain=domain,
             path=path,
-            secure=secure
+            secure=secure,
+            **conditional_cookie_kwargs
         )

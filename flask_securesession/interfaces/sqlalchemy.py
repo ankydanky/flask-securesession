@@ -35,6 +35,7 @@ class SqlAlchemySessionInterface(SessionInterface):
         self.key_prefix = key_prefix
         self.use_signer = use_signer
         self.permanent = permanent
+        self.has_same_site_capability = hasattr(self, "get_cookie_samesite")
 
         class Session(self.db.Model):
             __tablename__ = table
@@ -100,9 +101,12 @@ class SqlAlchemySessionInterface(SessionInterface):
                     self.db.session.commit()
                 response.delete_cookie(app.session_cookie_name, domain=domain, path=path)
             return
-
+        
+        conditional_cookie_kwargs = {}
         httponly = self.get_cookie_httponly(app)
         secure = self.get_cookie_secure(app)
+        if self.has_same_site_capability:
+            conditional_cookie_kwargs["samesite"] = self.get_cookie_samesite(app)
         expires = self.get_expiration_time(app, session)
         val = self.serializer.dumps(dict(session))
         val = encrypt(app.secret_key, val)
@@ -125,5 +129,6 @@ class SqlAlchemySessionInterface(SessionInterface):
             httponly=httponly,
             domain=domain,
             path=path,
-            secure=secure
+            secure=secure,
+            **conditional_cookie_kwargs
         )

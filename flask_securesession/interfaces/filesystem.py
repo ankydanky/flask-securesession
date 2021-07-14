@@ -64,6 +64,7 @@ class FileSystemSessionInterface(SessionInterface):
         self.key_prefix = key_prefix
         self.use_signer = use_signer
         self.permanent = permanent
+        self.has_same_site_capability = hasattr(self, "get_cookie_samesite")
 
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
@@ -96,8 +97,11 @@ class FileSystemSessionInterface(SessionInterface):
                 response.delete_cookie(app.session_cookie_name, domain=domain, path=path)
             return
 
+        conditional_cookie_kwargs = {}
         httponly = self.get_cookie_httponly(app)
         secure = self.get_cookie_secure(app)
+        if self.has_same_site_capability:
+            conditional_cookie_kwargs["samesite"] = self.get_cookie_samesite(app)
         expires = self.get_expiration_time(app, session)
         data = dict(session)
         data = encrypt(app.secret_key, data)
@@ -113,5 +117,6 @@ class FileSystemSessionInterface(SessionInterface):
             httponly=httponly,
             domain=domain,
             path=path,
-            secure=secure
+            secure=secure,
+            **conditional_cookie_kwargs
         )

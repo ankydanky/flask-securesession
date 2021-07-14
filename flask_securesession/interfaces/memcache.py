@@ -35,6 +35,7 @@ class MemcachedSessionInterface(SessionInterface):
         self.key_prefix = key_prefix
         self.use_signer = use_signer
         self.permanent = permanent
+        self.has_same_site_capability = hasattr(self, "get_cookie_samesite")
 
     def _get_preferred_memcache_client(self):
         servers = ['127.0.0.1:11211']
@@ -109,9 +110,12 @@ class MemcachedSessionInterface(SessionInterface):
                 self.client.delete(full_session_key)
                 response.delete_cookie(app.session_cookie_name, domain=domain, path=path)
             return
-
+        
+        conditional_cookie_kwargs = {}
         httponly = self.get_cookie_httponly(app)
         secure = self.get_cookie_secure(app)
+        if self.has_same_site_capability:
+            conditional_cookie_kwargs["samesite"] = self.get_cookie_samesite(app)
         expires = self.get_expiration_time(app, session)
         if not PY2:
             val = self.serializer.dumps(dict(session), 0)
@@ -129,4 +133,5 @@ class MemcachedSessionInterface(SessionInterface):
             session_id = session.sid
         response.set_cookie(app.session_cookie_name, session_id,
                             expires=expires, httponly=httponly,
-                            domain=domain, path=path, secure=secure)
+                            domain=domain, path=path, secure=secure,
+                            **conditional_cookie_kwargs)
