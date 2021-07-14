@@ -21,7 +21,7 @@ except FileNotFoundError:
 
 setup(
     name='Flask-SecureSession',
-    version='0.3.4',
+    version='0.4.0',
     url='https://github.com/ankydanky/flask-securesession',
     license='BSD',
     author='NDK',
@@ -34,7 +34,7 @@ setup(
     platforms='any',
     install_requires=[
         'Flask>=1.0',
-        'cachelib>=0.1.1',
+        'cachelib>=0.2.0',
         'pycryptodome>=3.9.9'
     ],
     test_suite='test_session',
