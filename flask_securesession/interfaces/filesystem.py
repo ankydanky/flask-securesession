@@ -1,6 +1,5 @@
 # coding: utf-8
 
-import time
 import os
 import pickle
 
@@ -12,29 +11,34 @@ from itsdangerous import want_bytes, BadSignature
 
 from cachelib.file import FileSystemCache as FileSystemCacheBase
 
+
 class FileSystemCache(FileSystemCacheBase):
     def __init__(self, cache_dir, threshold, mode):
         super().__init__(cache_dir, threshold=threshold, mode=mode)
     
-    def _prune(self):
-        """fix EOFError of original FileSystemCache"""
-        if self._threshold == 0 or not self._file_count > self._threshold:
-            return
-
+    def get(self, key):
+        """fix some EOFErrors if file got corrupt and remove file"""
+        filename = self._get_filename(key)
+        try:
+            return super().get(key)
+        except EOFError:
+            os.remove(filename)
+            return None
+    
+    def _remove_expired(self, now):
+        """fix EOFErrors"""
         entries = self._list_dir()
-        now = time.time()
-        for idx, fname in enumerate(entries):
+        for fname in entries:
             try:
-                remove = False
-                with open(fname, 'rb') as f:
+                with open(fname, "rb") as f:
                     expires = pickle.load(f)
-                remove = (expires != 0 and expires <= now) or idx % 3 == 0
-
-                if remove:
+                if expires != 0 and expires < now:
                     os.remove(fname)
-            except (EOFError, IOError, OSError):
+                    self._update_count(delta=-1)
+            except EOFError:
+                os.remove(fname)
+            except OSError:
                 pass
-        self._update_count(value=len(self._list_dir()))
 
 
 class FileSystemSessionInterface(SessionInterface):
