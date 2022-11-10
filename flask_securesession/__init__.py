@@ -11,7 +11,7 @@
     forked and backported by NDK
 """
 
-__version__ = '0.4.0'
+__version__ = '0.4.2'
 
 import os
 
