@@ -15,30 +15,6 @@ from cachelib.file import FileSystemCache as FileSystemCacheBase
 class FileSystemCache(FileSystemCacheBase):
     def __init__(self, cache_dir, threshold, mode):
         super().__init__(cache_dir, threshold=threshold, mode=mode)
-    
-    def get(self, key):
-        """fix some EOFErrors if file got corrupt and remove file"""
-        filename = self._get_filename(key)
-        try:
-            return super().get(key)
-        except EOFError:
-            os.remove(filename)
-            return None
-    
-    def _remove_expired(self, now):
-        """fix EOFErrors"""
-        entries = self._list_dir()
-        for fname in entries:
-            try:
-                with open(fname, "rb") as f:
-                    expires = pickle.load(f)
-                if expires != 0 and expires < now:
-                    os.remove(fname)
-                    self._update_count(delta=-1)
-            except EOFError:
-                os.remove(fname)
-            except OSError:
-                pass
 
 
 class FileSystemSessionInterface(SessionInterface):
